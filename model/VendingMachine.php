@@ -52,11 +52,11 @@ class VendingMachine
                         $this->amount -= $article->GetPrice();
                         $this->balance += $article->GetPrice();
                         $this->AddLog($article->GetPrice());
-                        return $article->GetName();
+                        return "Vending " . $article->GetName();
                     }
                     return "Not enough money!";
                 }
-                return $article->GetName() . ": Out of stock!";
+                return "Item " . $article->GetName() . ": Out of stock!";
             }
         }
         return "Invalid selection!";
@@ -67,7 +67,7 @@ class VendingMachine
      */
     public function GetChange(): float
     {
-        return $this->amount;
+        return round($this->amount, 2);
     }
 
     /**
@@ -75,7 +75,7 @@ class VendingMachine
      */
     public function GetBalance(): float
     {
-        return $this->balance;
+        return round($this->balance, 2);
     }
 
     /**

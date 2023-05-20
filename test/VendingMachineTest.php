@@ -10,6 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 class VendingMachineTest extends TestCase
 {
+    private VendingMachine $vendingMachine;
+
     protected function setUp(): void
     {
         $articles[] = new Article(
@@ -65,7 +67,7 @@ class VendingMachineTest extends TestCase
     {
         $this->vendingMachine->Insert(1.60);
         $this->assertEquals(
-            "Smarlies",
+            "Vending Smarlies",
             $this->vendingMachine->Choose("A01")
         );
     }
@@ -90,7 +92,7 @@ class VendingMachineTest extends TestCase
         $this->vendingMachine->Insert(10.00);
         $this->vendingMachine->Choose("A04");
         $this->assertEquals(
-            "KokoKola: Out of stock!",
+            "Item KokoKola: Out of stock!",
             $this->vendingMachine->Choose("A04")
         );
     }
@@ -135,10 +137,75 @@ class VendingMachineTest extends TestCase
         );
     }
 
+    #Test in CDC
+
     /**
      * @throws Exception
      */
-    public function testGetLogs(): void
+    public function testGetChangeSuccess(): void
+    {
+        $this->vendingMachine->Insert(3.40);
+        $this->vendingMachine->Choose("A01");
+        $this->assertEquals(
+            1.80,
+            $this->vendingMachine->GetChange()
+        );
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testGetBalanceSuccess(): void
+    {
+        $this->vendingMachine->Insert(2.10);
+        $this->vendingMachine->Choose("A03");
+        $this->assertEquals(0,$this->vendingMachine->GetChange());
+        $this->assertEquals(2.10,$this->vendingMachine->GetBalance());
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testChooseNotEnoughMoneyError(): void
+    {
+        $this->assertEquals("Not enough money!", $this->vendingMachine->Choose("A01"));
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testDoubleInsertSuccess(): void
+    {
+        $this->vendingMachine->Insert(1.00);
+        $this->vendingMachine->Choose("A01");
+        $this->assertEquals(1.00,$this->vendingMachine->GetChange());
+        $this->vendingMachine->Choose("A02");
+        $this->assertEquals(0.40,$this->vendingMachine->GetChange());
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testChooseInvalidSelectionFail(): void
+    {
+        $this->vendingMachine->Insert(1.00);
+        $this->assertEquals("Invalid selection!", $this->vendingMachine->Choose("A05"));
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testChooseOutOfStockFail(): void
+    {
+        $this->vendingMachine->Insert(6.00);
+        $this->assertEquals("Vending KokoKola", $this->vendingMachine->Choose("A04"));
+        $this->assertEquals("Item KokoKola: Out of stock!", $this->vendingMachine->Choose("A04"));
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testGetLogsSuccess(): void
     {
         $articles[] = new Article(
             "Smarlies",
